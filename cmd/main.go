@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"github.com/ValeryVlasov/Smarthouse_server"
-	"github.com/ValeryVlasov/Smarthouse_server/handler"
+	"github.com/ValeryVlasov/Smarthouse_server/pkg/handler"
+	"github.com/ValeryVlasov/Smarthouse_server/pkg/service"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"os"
@@ -12,7 +13,11 @@ import (
 )
 
 func main() {
-	handler := new(handler.Handler)
+	logrus.SetFormatter(new(logrus.JSONFormatter))
+
+	//repos := repository.NewRepository()
+	services := service.NewService()
+	handlers := handler.NewHandler(services)
 
 	if err := initConfig(); err != nil {
 		logrus.Fatalf("error initializing configs: %s", err.Error())
@@ -21,10 +26,11 @@ func main() {
 	srv := new(Smarthouse_server.Server)
 
 	go func() {
-		if err := srv.Run(viper.GetString("port"), handler.InitRoutes()); err != nil {
+		if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
 			logrus.Fatalf("An error occured while starting server: %s", err.Error())
 		}
 	}()
+
 	logrus.Print("Server started")
 
 	quit := make(chan os.Signal, 1)
