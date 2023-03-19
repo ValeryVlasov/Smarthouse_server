@@ -18,7 +18,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 	if input.Username != "dima" || input.Password != "123" {
-		newErrorResponse(c, http.StatusUnauthorized, "")
+		newErrorResponse(c, http.StatusUnauthorized, "wrong login or password")
 		return
 	}
 	response := "success"
