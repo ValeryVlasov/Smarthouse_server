@@ -1,9 +1,29 @@
 package handler
 
 import (
+	"github.com/ValeryVlasov/Smarthouse_server"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
+
+func (h *Handler) signUp(c *gin.Context) {
+	var input Smarthouse_server.User
+
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	id, err := h.services.Authorization.CreateUser(input)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"id": id,
+	})
+}
 
 type signInInput struct {
 	Username string `json:"username" binding:"required"`
@@ -11,22 +31,21 @@ type signInInput struct {
 }
 
 func (h *Handler) signIn(c *gin.Context) {
+
 	var input signInInput
 
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if input.Username != "dima" || input.Password != "123" {
-		newErrorResponse(c, http.StatusUnauthorized, "wrong login or password")
+
+	token, err := h.services.Authorization.GenerateToken(input.Username, input.Password)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	response := "success"
+
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"response": response,
+		"token": token,
 	})
-}
-
-func (h *Handler) signUp(c *gin.Context) {
-
 }
