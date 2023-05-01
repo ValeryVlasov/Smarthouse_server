@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	usersTable      = "users"
-	todoListsTable  = "device_lists"
-	usersListsTable = "users_lists"
+	usersTable       = "users"
+	deviceListsTable = "device_lists"
+	usersListsTable  = "users_lists"
 )
 
 type Config struct {
@@ -26,7 +26,6 @@ func NewPostgresDB(cfg Config) (*sqlx.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	err = db.Ping()
 	if err != nil {
 		return nil, err
