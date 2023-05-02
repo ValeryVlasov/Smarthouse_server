@@ -9,6 +9,8 @@ const (
 	usersTable       = "users"
 	deviceListsTable = "device_lists"
 	usersListsTable  = "users_lists"
+	deviceItemsTable = "device_items"
+	listsItemsTable  = "lists_items"
 )
 
 type Config struct {

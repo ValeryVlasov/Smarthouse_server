@@ -31,7 +31,6 @@ type signInInput struct {
 }
 
 func (h *Handler) signIn(c *gin.Context) {
-
 	var input signInInput
 
 	if err := c.BindJSON(&input); err != nil {
