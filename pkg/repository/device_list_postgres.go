@@ -42,7 +42,7 @@ func (r *DeviceListPostgres) Create(userId int, list Smarthouse_server.DeviceLis
 
 func (r *DeviceListPostgres) GetAll(userId int) ([]Smarthouse_server.DeviceList, error) {
 	var lists []Smarthouse_server.DeviceList
-	query := fmt.Sprintf("SELECT tl.id, tl.title, tl.description FROM %s tl INNER JOIN %s ul on tl.id = ul.list_id WHERE ul.user_id = $1", deviceListsTable, usersListsTable)
+	query := fmt.Sprintf("SELECT dl.id, dl.title, dl.description FROM %s dl INNER JOIN %s ul on dl.id = ul.list_id WHERE ul.user_id = $1", deviceListsTable, usersListsTable)
 	err := r.db.Select(&lists, query, userId)
 
 	return lists, err
@@ -50,14 +50,14 @@ func (r *DeviceListPostgres) GetAll(userId int) ([]Smarthouse_server.DeviceList,
 
 func (r *DeviceListPostgres) GetById(userId, listId int) (Smarthouse_server.DeviceList, error) {
 	var list Smarthouse_server.DeviceList
-	query := fmt.Sprintf(`SELECT tl.id, tl.title, tl.description FROM %s tl INNER JOIN %s ul on tl.id = ul.list_id WHERE ul.user_id = $1 AND ul.list_id = $2`, deviceListsTable, usersListsTable)
+	query := fmt.Sprintf(`SELECT dl.id, dl.title, dl.description FROM %s dl INNER JOIN %s ul on dl.id = ul.list_id WHERE ul.user_id = $1 AND ul.list_id = $2`, deviceListsTable, usersListsTable)
 	err := r.db.Get(&list, query, userId, listId)
 
 	return list, err
 }
 
 func (r *DeviceListPostgres) Delete(userId, listId int) error {
-	query := fmt.Sprintf("DELETE FROM %s tl USING %s ul WHERE tl.id = ul.list_id AND ul.user_id=$1 AND ul.list_id=$2", deviceListsTable, usersListsTable)
+	query := fmt.Sprintf("DELETE FROM %s dl USING %s ul WHERE dl.id = ul.list_id AND ul.user_id=$1 AND ul.list_id=$2", deviceListsTable, usersListsTable)
 	_, err := r.db.Exec(query, userId, listId)
 
 	return err
@@ -82,7 +82,7 @@ func (r *DeviceListPostgres) Update(userId, listId int, input Smarthouse_server.
 
 	setQuery := strings.Join(setValues, ", ")
 
-	query := fmt.Sprintf("UPDATE %s tl SET %s FROM %s ul WHERE tl.id = ul.list_id AND ul.list_id=$%d AND ul.user_id=$%d",
+	query := fmt.Sprintf("UPDATE %s dl SET %s FROM %s ul WHERE dl.id = ul.list_id AND ul.list_id=$%d AND ul.user_id=$%d",
 		deviceListsTable, setQuery, usersListsTable, argId, argId+1)
 
 	args = append(args, listId, userId)

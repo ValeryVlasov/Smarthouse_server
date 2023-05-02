@@ -43,7 +43,7 @@ func (r *DeviceItemPostgres) Create(listId int, item Smarthouse_server.DeviceIte
 
 func (r *DeviceItemPostgres) GetAll(userId, listId int) ([]Smarthouse_server.DeviceItem, error) {
 	var items []Smarthouse_server.DeviceItem
-	query := fmt.Sprintf(`SELECT ti.id, ti.title, ti.description, ti.done FROM %s ti INNER JOIN %s li on li.item_id = ti.id
+	query := fmt.Sprintf(`SELECT di.id, di.title, di.description, di.isPowerOn FROM %s di INNER JOIN %s li on li.item_id = di.id
 									INNER JOIN %s ul on ul.list_id = li.list_id WHERE li.list_id = $1 AND ul.user_id = $2`,
 		deviceItemsTable, listsItemsTable, usersListsTable)
 	if err := r.db.Select(&items, query, listId, userId); err != nil {
@@ -55,8 +55,8 @@ func (r *DeviceItemPostgres) GetAll(userId, listId int) ([]Smarthouse_server.Dev
 
 func (r *DeviceItemPostgres) GetById(userId, itemId int) (Smarthouse_server.DeviceItem, error) {
 	var item Smarthouse_server.DeviceItem
-	query := fmt.Sprintf(`SELECT ti.id, ti.title, ti.description, ti.done FROM %s ti INNER JOIN %s li on li.item_id = ti.id
-									INNER JOIN %s ul on ul.list_id = li.list_id WHERE ti.id = $1 AND ul.user_id = $2`,
+	query := fmt.Sprintf(`SELECT di.id, di.title, di.description, di.isPowerOn FROM %s di INNER JOIN %s li on li.item_id = di.id
+									INNER JOIN %s ul on ul.list_id = li.list_id WHERE di.id = $1 AND ul.user_id = $2`,
 		deviceItemsTable, listsItemsTable, usersListsTable)
 	if err := r.db.Get(&item, query, itemId, userId); err != nil {
 		return item, err
@@ -66,8 +66,8 @@ func (r *DeviceItemPostgres) GetById(userId, itemId int) (Smarthouse_server.Devi
 }
 
 func (r *DeviceItemPostgres) Delete(userId, itemId int) error {
-	query := fmt.Sprintf(`DELETE FROM %s ti USING %s li, %s ul 
-									WHERE ti.id = li.item_id AND li.list_id = ul.list_id AND ul.user_id = $1 AND ti.id = $2`,
+	query := fmt.Sprintf(`DELETE FROM %s di USING %s li, %s ul 
+									WHERE di.id = li.item_id AND li.list_id = ul.list_id AND ul.user_id = $1 AND di.id = $2`,
 		deviceItemsTable, listsItemsTable, usersListsTable)
 	_, err := r.db.Exec(query, userId, itemId)
 	return err
@@ -98,8 +98,8 @@ func (r *DeviceItemPostgres) Update(userId, itemId int, input Smarthouse_server.
 
 	setQuery := strings.Join(setValues, ", ")
 
-	query := fmt.Sprintf(`UPDATE %s ti SET %s FROM %s li, %s ul
-									WHERE ti.id = li.item_id AND li.list_id = ul.list_id AND ul.user_id = $%d AND ti.id = $%d`,
+	query := fmt.Sprintf(`UPDATE %s di SET %s FROM %s li, %s ul
+									WHERE di.id = li.item_id AND li.list_id = ul.list_id AND ul.user_id = $%d AND di.id = $%d`,
 		deviceItemsTable, setQuery, listsItemsTable, usersListsTable, argId, argId+1)
 	args = append(args, userId, itemId)
 
