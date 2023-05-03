@@ -23,9 +23,9 @@ CREATE TABLE users_lists
 CREATE TABLE device_items
 (
     id          serial  not null unique,
-    title       varchar(255) not null,
-    description varchar(255),
-    isPowerOn boolean not null default false
+    name       varchar(255) not null,
+    place varchar(255),
+    condition boolean not null default false
 );
 
 CREATE TABLE lists_device_items

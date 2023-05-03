@@ -15,10 +15,10 @@ type UsersList struct {
 }
 
 type DeviceItem struct {
-	Id          int    `json:"id" db:"id"`
-	Title       string `json:"title" db:"title" binding:"required"`
-	Description string `json:"description" db:"description"`
-	IsPowerOn   bool   `json:"IsPowerOn" db:"IsPowerOn"`
+	Id        int    `json:"id" db:"id"`
+	Name      string `json:"name" db:"name" binding:"required"`
+	Place     string `json:"place" db:"place"`
+	Condition bool   `json:"condition" db:"condition"`
 }
 
 type ListsItem struct {
@@ -41,13 +41,13 @@ func (i UpdateListInput) Validate() error {
 }
 
 type UpdateItemInput struct {
-	Title       *string `json:"title"`
-	Description *string `json:"description"`
-	IsPowerOn   *bool   `json:"IsPowerOn"`
+	Name      *string `json:"name"`
+	Place     *string `json:"place"`
+	Condition *bool   `json:"condition"`
 }
 
 func (i UpdateItemInput) Validate() error {
-	if i.Title == nil && i.Description == nil && i.IsPowerOn == nil {
+	if i.Name == nil && i.Place == nil && i.Condition == nil {
 		return errors.New("update structure has no values")
 	}
 

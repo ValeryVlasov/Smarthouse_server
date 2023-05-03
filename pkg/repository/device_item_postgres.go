@@ -22,9 +22,9 @@ func (r *DeviceItemPostgres) Create(listId int, item Smarthouse_server.DeviceIte
 	}
 
 	var itemId int
-	createItemQuery := fmt.Sprintf("INSERT INTO %s (title, description) values ($1, $2) RETURNING id", deviceItemsTable)
+	createItemQuery := fmt.Sprintf("INSERT INTO %s (name, place) values ($1, $2) RETURNING id", deviceItemsTable)
 
-	row := tx.QueryRow(createItemQuery, item.Title, item.Description)
+	row := tx.QueryRow(createItemQuery, item.Name, item.Place)
 	err = row.Scan(&itemId)
 	if err != nil {
 		tx.Rollback()
@@ -43,7 +43,7 @@ func (r *DeviceItemPostgres) Create(listId int, item Smarthouse_server.DeviceIte
 
 func (r *DeviceItemPostgres) GetAll(userId, listId int) ([]Smarthouse_server.DeviceItem, error) {
 	var items []Smarthouse_server.DeviceItem
-	query := fmt.Sprintf(`SELECT di.id, di.title, di.description, di.isPowerOn FROM %s di INNER JOIN %s li on li.item_id = di.id
+	query := fmt.Sprintf(`SELECT di.id, di.name, di.place, di.condition FROM %s di INNER JOIN %s li on li.item_id = di.id
 									INNER JOIN %s ul on ul.list_id = li.list_id WHERE li.list_id = $1 AND ul.user_id = $2`,
 		deviceItemsTable, listsItemsTable, usersListsTable)
 	if err := r.db.Select(&items, query, listId, userId); err != nil {
@@ -55,7 +55,7 @@ func (r *DeviceItemPostgres) GetAll(userId, listId int) ([]Smarthouse_server.Dev
 
 func (r *DeviceItemPostgres) GetById(userId, itemId int) (Smarthouse_server.DeviceItem, error) {
 	var item Smarthouse_server.DeviceItem
-	query := fmt.Sprintf(`SELECT di.id, di.title, di.description, di.isPowerOn FROM %s di INNER JOIN %s li on li.item_id = di.id
+	query := fmt.Sprintf(`SELECT di.id, di.name, di.place, di.condition FROM %s di INNER JOIN %s li on li.item_id = di.id
 									INNER JOIN %s ul on ul.list_id = li.list_id WHERE di.id = $1 AND ul.user_id = $2`,
 		deviceItemsTable, listsItemsTable, usersListsTable)
 	if err := r.db.Get(&item, query, itemId, userId); err != nil {
@@ -78,21 +78,21 @@ func (r *DeviceItemPostgres) Update(userId, itemId int, input Smarthouse_server.
 	args := make([]interface{}, 0)
 	argId := 1
 
-	if input.Title != nil {
-		setValues = append(setValues, fmt.Sprintf("title=$%d", argId))
-		args = append(args, *input.Title)
+	if input.Name != nil {
+		setValues = append(setValues, fmt.Sprintf("name=$%d", argId))
+		args = append(args, *input.Name)
 		argId++
 	}
 
-	if input.Description != nil {
-		setValues = append(setValues, fmt.Sprintf("description=$%d", argId))
-		args = append(args, *input.Description)
+	if input.Place != nil {
+		setValues = append(setValues, fmt.Sprintf("place=$%d", argId))
+		args = append(args, *input.Place)
 		argId++
 	}
 
-	if input.IsPowerOn != nil {
+	if input.Condition != nil {
 		setValues = append(setValues, fmt.Sprintf("done=$%d", argId))
-		args = append(args, *input.IsPowerOn)
+		args = append(args, *input.Condition)
 		argId++
 	}
 
