@@ -91,7 +91,7 @@ func (r *DeviceItemPostgres) Update(userId, itemId int, input Smarthouse_server.
 	}
 
 	if input.Condition != nil {
-		setValues = append(setValues, fmt.Sprintf("done=$%d", argId))
+		setValues = append(setValues, fmt.Sprintf("condition=$%d", argId))
 		args = append(args, *input.Condition)
 		argId++
 	}
