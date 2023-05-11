@@ -36,5 +36,8 @@ func (s *DeviceItemService) Delete(userId, itemId int) error {
 }
 
 func (s *DeviceItemService) Update(userId, itemId int, input Smarthouse_server.UpdateItemInput) error {
+	if err := input.Validate(); err != nil {
+		return err
+	}
 	return s.repo.Update(userId, itemId, input)
 }
