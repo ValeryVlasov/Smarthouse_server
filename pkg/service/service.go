@@ -9,7 +9,7 @@ type Authorization interface {
 	CreateUser(user Smarthouse_server.User) (int, error)
 	GenerateToken(username, password string) (string, error)
 	ParseToken(token string) (int, error)
-	IsSameUser(login, password interface{}) (Smarthouse_server.User2, bool)
+	IsSameUser(login, password interface{}) (Smarthouse_server.User, bool)
 }
 
 type DeviceLight interface {

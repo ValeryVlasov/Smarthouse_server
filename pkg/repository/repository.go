@@ -8,7 +8,7 @@ import (
 type Authorization interface {
 	CreateUser(user Smarthouse_server.User) (int, error)
 	GetUser(username, password string) (Smarthouse_server.User, error)
-	GetUser2(username, password string) (Smarthouse_server.User2, error)
+	//	GetUser2(username, password string) (Smarthouse_server.User2, error)
 	IsSameUser(login, password interface{}) bool
 }
 

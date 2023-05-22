@@ -31,12 +31,12 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 }
 
 func (s *AuthService) CreateUser(user Smarthouse_server.User) (int, error) {
-	user.Password = generatePasswordHash(user.Password)
+	user.Password_hash = generatePasswordHash(user.Password_hash)
 	return s.repo.CreateUser(user)
 }
 
-func (s *AuthService) IsSameUser(login, password interface{}) (Smarthouse_server.User2, bool) {
-	user, err := s.repo.GetUser2(cast.ToString(login), generatePasswordHash(cast.ToString(password)))
+func (s *AuthService) IsSameUser(login, password interface{}) (Smarthouse_server.User, bool) {
+	user, err := s.repo.GetUser(cast.ToString(login), generatePasswordHash(cast.ToString(password)))
 	if err != nil {
 		fmt.Println(err.Error())
 		return user, false

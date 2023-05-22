@@ -16,7 +16,7 @@ func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 }
 
 func (r *AuthPostgres) IsSameUser(login, password interface{}) bool {
-	var user Smarthouse_server.User2
+	var user Smarthouse_server.User
 
 	fmt.Println(r.db.Get(&user, "SELECT * FROM users WHERE id=1"))
 	if err := r.db.Get(&user, "SELECT * FROM users WHERE id=1"); err != nil {
@@ -32,7 +32,7 @@ func (r *AuthPostgres) IsSameUser(login, password interface{}) bool {
 func (r *AuthPostgres) CreateUser(user Smarthouse_server.User) (int, error) {
 	var id int
 	query := fmt.Sprintf("INSERT INTO %s (name, username, password_hash) values ($1, $2, $3) RETURNING id", usersTable)
-	row := r.db.QueryRow(query, user.Name, user.Username, user.Password)
+	row := r.db.QueryRow(query, user.Name, user.Username, user.Password_hash)
 	if err := row.Scan(&id); err != nil {
 		return 0, err
 	}
@@ -47,8 +47,8 @@ func (r *AuthPostgres) GetUser(username, password string) (Smarthouse_server.Use
 	return user, err
 }
 
-func (r *AuthPostgres) GetUser2(username, password string) (Smarthouse_server.User2, error) {
-	var user Smarthouse_server.User2
+func (r *AuthPostgres) GetUser2(username, password string) (Smarthouse_server.User, error) {
+	var user Smarthouse_server.User
 	query := fmt.Sprintf("SELECT * FROM %s WHERE username=$1 AND password_hash=$2", usersTable)
 	err := r.db.Get(&user, query, username, password)
 
