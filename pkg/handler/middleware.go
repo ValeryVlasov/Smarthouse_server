@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -35,6 +36,7 @@ func (h *Handler) userIdentity(c *gin.Context) {
 }
 
 func getUserId(c *gin.Context) (int, error) {
+	fmt.Println(c)
 	id, ok := c.Get(userCtx)
 	if !ok {
 		newErrorResponse(c, http.StatusInternalServerError, "user id not found")

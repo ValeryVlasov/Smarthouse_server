@@ -7,6 +7,7 @@ import (
 	"github.com/ValeryVlasov/Smarthouse_server"
 	"github.com/ValeryVlasov/Smarthouse_server/pkg/repository"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/spf13/cast"
 	"time"
 )
 
@@ -32,6 +33,18 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 func (s *AuthService) CreateUser(user Smarthouse_server.User) (int, error) {
 	user.Password = generatePasswordHash(user.Password)
 	return s.repo.CreateUser(user)
+}
+
+func (s *AuthService) IsSameUser(login, password interface{}) (Smarthouse_server.User2, bool) {
+	user, err := s.repo.GetUser2(cast.ToString(login), generatePasswordHash(cast.ToString(password)))
+	if err != nil {
+		fmt.Println(err.Error())
+		return user, false
+	}
+	if user.Username != cast.ToString(login) || user.Password_hash != cast.ToString(generatePasswordHash(cast.ToString(password))) {
+		return user, false
+	}
+	return user, true
 }
 
 func (s *AuthService) GenerateToken(username, password string) (string, error) {

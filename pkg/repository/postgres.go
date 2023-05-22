@@ -6,19 +6,13 @@ import (
 )
 
 const (
-	usersTable       = "users"
-	deviceListsTable = "device_lists"
-	usersListsTable  = "users_lists"
-	deviceItemsTable = "device_items"
-	listsItemsTable  = "lists_device_items"
-	//
+	usersTable           = "users"
 	deviceLightsTable    = "device_lights"
 	deviceCamerasTable   = "device_cameras"
 	deviceDetectorsTable = "device_detectors"
-	/**/
-	usersLightsTable    = "users_lights"
-	usersCamerasTable   = "users_cameras"
-	usersDetectorsTable = "users_detectors"
+	usersLightsTable     = "users_lights"
+	usersCamerasTable    = "users_cameras"
+	usersDetectorsTable  = "users_detectors"
 )
 
 type Config struct {

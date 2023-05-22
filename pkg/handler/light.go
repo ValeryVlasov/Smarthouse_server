@@ -8,8 +8,9 @@ import (
 )
 
 func (h *Handler) createLight(c *gin.Context) {
-	userId, err := getUserId(c)
-	if err != nil {
+	user, ok := h.GetUser(c)
+	if !ok {
+		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
@@ -19,7 +20,7 @@ func (h *Handler) createLight(c *gin.Context) {
 		return
 	}
 
-	lightId, err := h.services.DeviceLight.Create(userId, input)
+	lightId, err := h.services.DeviceLight.Create(user.Id, input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -30,31 +31,26 @@ func (h *Handler) createLight(c *gin.Context) {
 	})
 }
 
-type getAllLightsResponse struct {
-	Data []Smarthouse_server.DeviceLight `json:"lights"`
-}
-
 func (h *Handler) getAllLights(c *gin.Context) {
-	userId, err := getUserId(c)
+	user, ok := h.GetUser(c)
+	if !ok {
+		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
+		return
+	}
+
+	lights, err := h.services.DeviceLight.GetAll(user.Id)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	lights, err := h.services.DeviceLight.GetAll(userId)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	c.JSON(http.StatusOK, getAllLightsResponse{
-		Data: lights,
-	})
+	c.JSON(http.StatusOK, lights)
 }
 
 func (h *Handler) getLightById(c *gin.Context) {
-	userId, err := getUserId(c)
-	if err != nil {
+	user, ok := h.GetUser(c)
+	if !ok {
+		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
@@ -64,7 +60,7 @@ func (h *Handler) getLightById(c *gin.Context) {
 		return
 	}
 
-	light, err := h.services.DeviceLight.GetById(userId, lightId)
+	light, err := h.services.DeviceLight.GetById(user.Id, lightId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -74,8 +70,9 @@ func (h *Handler) getLightById(c *gin.Context) {
 }
 
 func (h *Handler) updateLight(c *gin.Context) {
-	userId, err := getUserId(c)
-	if err != nil {
+	user, ok := h.GetUser(c)
+	if !ok {
+		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
@@ -91,7 +88,7 @@ func (h *Handler) updateLight(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.DeviceLight.Update(userId, lightId, input); err != nil {
+	if err := h.services.DeviceLight.Update(user.Id, lightId, input); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -100,8 +97,9 @@ func (h *Handler) updateLight(c *gin.Context) {
 }
 
 func (h *Handler) deleteLight(c *gin.Context) {
-	userId, err := getUserId(c)
-	if err != nil {
+	user, ok := h.GetUser(c)
+	if !ok {
+		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
@@ -111,7 +109,31 @@ func (h *Handler) deleteLight(c *gin.Context) {
 		return
 	}
 
-	err = h.services.DeviceLight.Delete(userId, lightId)
+	err = h.services.DeviceLight.Delete(user.Id, lightId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, statusResponse{
+		Status: "ok",
+	})
+}
+
+func (h *Handler) toggleLight(c *gin.Context) {
+	user, ok := h.GetUser(c)
+	if !ok {
+		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
+		return
+	}
+
+	lightId, err := strconv.Atoi(c.Param("light_id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid lightId param")
+		return
+	}
+
+	err = h.services.DeviceLight.Toggle(user.Id, lightId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

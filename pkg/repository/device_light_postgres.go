@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/ValeryVlasov/Smarthouse_server"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 	"strings"
 )
 
@@ -100,5 +101,24 @@ func (r *DeviceLightPostgres) Update(userId, lightId int, input Smarthouse_serve
 	args = append(args, userId, lightId)
 
 	_, err := r.db.Exec(query, args...)
+	return err
+}
+
+func (r *DeviceLightPostgres) Toggle(userId, lightId int) error {
+	var light Smarthouse_server.DeviceLight
+	light, err := r.GetById(userId, lightId)
+	if err != nil {
+		logrus.Println(1)
+		return err
+	}
+
+	var toggle Smarthouse_server.UpdateLightInput
+	toggle.Name = nil
+	toggle.Place = nil
+	toggle.Condition = new(bool)
+	*toggle.Condition = !light.Condition
+
+	err = r.Update(userId, lightId, toggle)
+
 	return err
 }

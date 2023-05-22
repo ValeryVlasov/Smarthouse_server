@@ -29,6 +29,10 @@ func (s *DeviceLightService) Delete(userId, lightId int) error {
 	return s.repo.Delete(userId, lightId)
 }
 
+func (s *DeviceLightService) Toggle(userId, lightId int) error {
+	return s.repo.Toggle(userId, lightId)
+}
+
 func (s *DeviceLightService) Update(userId, lightId int, input Smarthouse_server.UpdateLightInput) error {
 	if err := input.Validate(); err != nil {
 		return err

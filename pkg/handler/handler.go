@@ -27,26 +27,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		home.GET("", h.home)
 	}
 
-	api := router.Group("/api", h.userIdentity)
+	api := router.Group("/api" /*, h.userIdentity*/) //TODO::убрать, чтобы можно было достучаться без авторизации или вынести devices из api
 	{
-		lists := api.Group("/lists")
-		{
-			lists.POST("/", h.createList)
-			lists.GET("/", h.getAllLists)
-			lists.GET("/:id", h.getListById)
-			lists.PUT("/:id", h.updateList)
-			lists.DELETE("/:id", h.deleteList)
-
-			items := lists.Group(":id/items")
-			{
-				items.POST("/", h.createItem)
-				items.GET("/", h.getAllItems)
-				items.GET("/:item_id", h.getItemById)
-				items.PUT("/:item_id", h.updateItem)
-				items.DELETE("/:item_id", h.deleteItem)
-			}
-		}
-
 		devices := api.Group("/devices")
 		{
 			lights := devices.Group("/lights")
@@ -56,6 +38,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				lights.GET("/:light_id", h.getLightById)
 				lights.PUT("/:light_id", h.updateLight)
 				lights.DELETE("/:light_id", h.deleteLight)
+				lights.POST("/:light_id/toggle/", h.toggleLight)
 			}
 
 			cameras := devices.Group("/cameras")

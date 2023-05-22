@@ -8,22 +8,8 @@ import (
 type Authorization interface {
 	CreateUser(user Smarthouse_server.User) (int, error)
 	GetUser(username, password string) (Smarthouse_server.User, error)
-}
-
-type DeviceList interface {
-	Create(userId int, list Smarthouse_server.DeviceList) (int, error)
-	GetAll(userId int) ([]Smarthouse_server.DeviceList, error)
-	GetById(userId, listId int) (Smarthouse_server.DeviceList, error)
-	Delete(userId, listId int) error
-	Update(userId, listId int, input Smarthouse_server.UpdateListInput) error
-}
-
-type DeviceItem interface {
-	Create(listId int, item Smarthouse_server.DeviceItem) (int, error)
-	GetAll(userId, listId int) ([]Smarthouse_server.DeviceItem, error)
-	GetById(userId, itemId int) (Smarthouse_server.DeviceItem, error)
-	Delete(userId, itemId int) error
-	Update(userId, itemId int, input Smarthouse_server.UpdateItemInput) error
+	GetUser2(username, password string) (Smarthouse_server.User2, error)
+	IsSameUser(login, password interface{}) bool
 }
 
 type DeviceLight interface {
@@ -31,6 +17,7 @@ type DeviceLight interface {
 	GetAll(userId int) ([]Smarthouse_server.DeviceLight, error)
 	GetById(userId, lightId int) (Smarthouse_server.DeviceLight, error)
 	Delete(userId, lightId int) error
+	Toggle(userId, lightId int) error
 	Update(userId, lightId int, input Smarthouse_server.UpdateLightInput) error
 }
 
@@ -52,8 +39,6 @@ type DeviceDetector interface {
 
 type Repository struct {
 	Authorization
-	DeviceList
-	DeviceItem
 	DeviceLight
 	DeviceCamera
 	DeviceDetector
@@ -62,8 +47,6 @@ type Repository struct {
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Authorization:  NewAuthPostgres(db),
-		DeviceList:     NewDeviceListPostgres(db),
-		DeviceItem:     NewDeviceItemPostgres(db),
 		DeviceLight:    NewDeviceLightPostgres(db),
 		DeviceCamera:   NewDeviceCameraPostgres(db),
 		DeviceDetector: NewDeviceDetectorPostgres(db),

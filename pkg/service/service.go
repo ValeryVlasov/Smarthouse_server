@@ -9,22 +9,7 @@ type Authorization interface {
 	CreateUser(user Smarthouse_server.User) (int, error)
 	GenerateToken(username, password string) (string, error)
 	ParseToken(token string) (int, error)
-}
-
-type DeviceList interface {
-	Create(userId int, list Smarthouse_server.DeviceList) (int, error)
-	GetAll(userId int) ([]Smarthouse_server.DeviceList, error)
-	GetById(userId, listId int) (Smarthouse_server.DeviceList, error)
-	Delete(userId, listId int) error
-	Update(userId, listId int, input Smarthouse_server.UpdateListInput) error
-}
-
-type DeviceItem interface {
-	Create(userId, listId int, item Smarthouse_server.DeviceItem) (int, error)
-	GetAll(userId, listId int) ([]Smarthouse_server.DeviceItem, error)
-	GetById(userId, itemId int) (Smarthouse_server.DeviceItem, error)
-	Delete(userId, itemId int) error
-	Update(userId, itemId int, input Smarthouse_server.UpdateItemInput) error
+	IsSameUser(login, password interface{}) (Smarthouse_server.User2, bool)
 }
 
 type DeviceLight interface {
@@ -32,6 +17,7 @@ type DeviceLight interface {
 	GetAll(userId int) ([]Smarthouse_server.DeviceLight, error)
 	GetById(userId, lightId int) (Smarthouse_server.DeviceLight, error)
 	Delete(userId, lightId int) error
+	Toggle(userId, lightId int) error
 	Update(userId, lightId int, input Smarthouse_server.UpdateLightInput) error
 }
 
@@ -53,8 +39,6 @@ type DeviceDetector interface {
 
 type Service struct {
 	Authorization
-	DeviceList
-	DeviceItem
 	DeviceLight
 	DeviceCamera
 	DeviceDetector
@@ -63,8 +47,6 @@ type Service struct {
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Authorization:  NewAuthService(repos.Authorization),
-		DeviceList:     NewDeviceListService(repos.DeviceList),
-		DeviceItem:     NewDeviceItemService(repos.DeviceItem, repos.DeviceList),
 		DeviceLight:    NewDeviceLightService(repos.DeviceLight),
 		DeviceCamera:   NewDeviceCameraService(repos.DeviceCamera),
 		DeviceDetector: NewDeviceDetectorService(repos.DeviceDetector),

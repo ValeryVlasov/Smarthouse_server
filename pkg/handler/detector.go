@@ -8,8 +8,9 @@ import (
 )
 
 func (h *Handler) createDetector(c *gin.Context) {
-	userId, err := getUserId(c)
-	if err != nil {
+	user, ok := h.GetUser(c)
+	if !ok {
+		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
@@ -19,7 +20,7 @@ func (h *Handler) createDetector(c *gin.Context) {
 		return
 	}
 
-	detectorId, err := h.services.DeviceDetector.Create(userId, input)
+	detectorId, err := h.services.DeviceDetector.Create(user.Id, input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -35,13 +36,13 @@ type getAllDetectorsResponse struct {
 }
 
 func (h *Handler) getAllDetectors(c *gin.Context) {
-	userId, err := getUserId(c)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	user, ok := h.GetUser(c)
+	if !ok {
+		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
-	detectors, err := h.services.DeviceDetector.GetAll(userId)
+	detectors, err := h.services.DeviceDetector.GetAll(user.Id)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -53,8 +54,9 @@ func (h *Handler) getAllDetectors(c *gin.Context) {
 }
 
 func (h *Handler) getDetectorById(c *gin.Context) {
-	userId, err := getUserId(c)
-	if err != nil {
+	user, ok := h.GetUser(c)
+	if !ok {
+		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
@@ -64,7 +66,7 @@ func (h *Handler) getDetectorById(c *gin.Context) {
 		return
 	}
 
-	detector, err := h.services.DeviceDetector.GetById(userId, detectorId)
+	detector, err := h.services.DeviceDetector.GetById(user.Id, detectorId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -74,8 +76,9 @@ func (h *Handler) getDetectorById(c *gin.Context) {
 }
 
 func (h *Handler) updateDetector(c *gin.Context) {
-	userId, err := getUserId(c)
-	if err != nil {
+	user, ok := h.GetUser(c)
+	if !ok {
+		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
@@ -91,7 +94,7 @@ func (h *Handler) updateDetector(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.DeviceDetector.Update(userId, detectorId, input); err != nil {
+	if err := h.services.DeviceDetector.Update(user.Id, detectorId, input); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -100,8 +103,9 @@ func (h *Handler) updateDetector(c *gin.Context) {
 }
 
 func (h *Handler) deleteDetector(c *gin.Context) {
-	userId, err := getUserId(c)
-	if err != nil {
+	user, ok := h.GetUser(c)
+	if !ok {
+		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
@@ -111,7 +115,7 @@ func (h *Handler) deleteDetector(c *gin.Context) {
 		return
 	}
 
-	err = h.services.DeviceDetector.Delete(userId, detectorId)
+	err = h.services.DeviceDetector.Delete(user.Id, detectorId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
