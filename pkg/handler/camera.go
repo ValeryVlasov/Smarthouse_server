@@ -3,14 +3,14 @@ package handler
 import (
 	"github.com/ValeryVlasov/Smarthouse_server"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/cast"
 	"net/http"
 	"strconv"
 )
 
 func (h *Handler) createCamera(c *gin.Context) {
-	user, ok := h.GetUser(c)
+	userId, ok := c.Get(userCtx)
 	if !ok {
-		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
@@ -20,7 +20,7 @@ func (h *Handler) createCamera(c *gin.Context) {
 		return
 	}
 
-	cameraId, err := h.services.DeviceCamera.Create(user.Id, input)
+	cameraId, err := h.services.DeviceCamera.Create(cast.ToInt(userId), input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -31,18 +31,12 @@ func (h *Handler) createCamera(c *gin.Context) {
 	})
 }
 
-type getAllCamerasResponse struct {
-	Data []Smarthouse_server.DeviceCamera `json:"cameras"`
-}
-
 func (h *Handler) getAllCameras(c *gin.Context) {
-	user, ok := h.GetUser(c)
+	userId, ok := c.Get(userCtx)
 	if !ok {
-		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
-
-	cameras, err := h.services.DeviceCamera.GetAll(user.Id)
+	cameras, err := h.services.DeviceCamera.GetAll(cast.ToInt(userId))
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -52,9 +46,8 @@ func (h *Handler) getAllCameras(c *gin.Context) {
 }
 
 func (h *Handler) getCameraById(c *gin.Context) {
-	user, ok := h.GetUser(c)
+	userId, ok := c.Get(userCtx)
 	if !ok {
-		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
@@ -64,7 +57,7 @@ func (h *Handler) getCameraById(c *gin.Context) {
 		return
 	}
 
-	camera, err := h.services.DeviceCamera.GetById(user.Id, cameraId)
+	camera, err := h.services.DeviceCamera.GetById(cast.ToInt(userId), cameraId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -74,9 +67,8 @@ func (h *Handler) getCameraById(c *gin.Context) {
 }
 
 func (h *Handler) updateCamera(c *gin.Context) {
-	user, ok := h.GetUser(c)
+	userId, ok := c.Get(userCtx)
 	if !ok {
-		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
@@ -92,7 +84,7 @@ func (h *Handler) updateCamera(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.DeviceCamera.Update(user.Id, cameraId, input); err != nil {
+	if err := h.services.DeviceCamera.Update(cast.ToInt(userId), cameraId, input); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -101,9 +93,8 @@ func (h *Handler) updateCamera(c *gin.Context) {
 }
 
 func (h *Handler) deleteCamera(c *gin.Context) {
-	user, ok := h.GetUser(c)
+	userId, ok := c.Get(userCtx)
 	if !ok {
-		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
@@ -113,7 +104,7 @@ func (h *Handler) deleteCamera(c *gin.Context) {
 		return
 	}
 
-	err = h.services.DeviceCamera.Delete(user.Id, cameraId)
+	err = h.services.DeviceCamera.Delete(cast.ToInt(userId), cameraId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

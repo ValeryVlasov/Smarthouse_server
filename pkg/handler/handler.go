@@ -5,6 +5,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	authorizationHeader = "Authorization"
+	userCtx             = "userId"
+)
+
 type Handler struct {
 	services *service.Service
 }
@@ -27,7 +32,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		home.GET("", h.home)
 	}
 
-	api := router.Group("/api" /*, h.userIdentity*/) //TODO::убрать, чтобы можно было достучаться без авторизации или вынести devices из api
+	api := router.Group("/api", h.userIdentity)
 	{
 		devices := api.Group("/devices")
 		{

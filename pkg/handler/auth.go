@@ -28,13 +28,7 @@ func (h *Handler) signUp(c *gin.Context) {
 	})
 }
 
-type signInInput struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
 func (h *Handler) signIn(c *gin.Context) {
-
 	user, ok := h.GetUser(c)
 	if !ok {
 		return
@@ -46,16 +40,15 @@ func (h *Handler) signIn(c *gin.Context) {
 
 func (h *Handler) GetUser(c *gin.Context) (Smarthouse_server.User, bool) {
 	var user Smarthouse_server.User
+	fmt.Println("Context: ")
 	fmt.Println(c)
 	tokenString := c.GetHeader(authorizationHeader)
 	claims := jwt.MapClaims{}
 	_, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		fmt.Println(122)
 		return []byte("secret"), nil
 	})
 	fmt.Println(tokenString)
 	if err != nil {
-		fmt.Println(3332)
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return user, false
 	}
@@ -67,7 +60,6 @@ func (h *Handler) GetUser(c *gin.Context) (Smarthouse_server.User, bool) {
 	user, ok := h.services.Authorization.IsSameUser(claims["username"], claims["password"])
 	fmt.Println("ok = " + cast.ToString(ok))
 	if !ok {
-		fmt.Println(555)
 		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return user, false
 	}

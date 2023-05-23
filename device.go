@@ -2,12 +2,6 @@ package Smarthouse_server
 
 import "errors"
 
-type UsersList struct {
-	Id     int
-	UserId int
-	ListId int
-}
-
 type DeviceLight struct {
 	Id        int    `json:"id" db:"id"`
 	Name      string `json:"name" db:"name" binding:"required"`

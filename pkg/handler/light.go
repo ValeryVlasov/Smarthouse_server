@@ -3,14 +3,14 @@ package handler
 import (
 	"github.com/ValeryVlasov/Smarthouse_server"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/cast"
 	"net/http"
 	"strconv"
 )
 
 func (h *Handler) createLight(c *gin.Context) {
-	user, ok := h.GetUser(c)
+	userId, ok := c.Get(userCtx)
 	if !ok {
-		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
@@ -20,7 +20,7 @@ func (h *Handler) createLight(c *gin.Context) {
 		return
 	}
 
-	lightId, err := h.services.DeviceLight.Create(user.Id, input)
+	lightId, err := h.services.DeviceLight.Create(cast.ToInt(userId), input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -32,13 +32,12 @@ func (h *Handler) createLight(c *gin.Context) {
 }
 
 func (h *Handler) getAllLights(c *gin.Context) {
-	user, ok := h.GetUser(c)
+	userId, ok := c.Get(userCtx)
 	if !ok {
-		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
-	lights, err := h.services.DeviceLight.GetAll(user.Id)
+	lights, err := h.services.DeviceLight.GetAll(cast.ToInt(userId))
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -48,9 +47,8 @@ func (h *Handler) getAllLights(c *gin.Context) {
 }
 
 func (h *Handler) getLightById(c *gin.Context) {
-	user, ok := h.GetUser(c)
+	userId, ok := c.Get(userCtx)
 	if !ok {
-		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
@@ -60,7 +58,7 @@ func (h *Handler) getLightById(c *gin.Context) {
 		return
 	}
 
-	light, err := h.services.DeviceLight.GetById(user.Id, lightId)
+	light, err := h.services.DeviceLight.GetById(cast.ToInt(userId), lightId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -70,9 +68,8 @@ func (h *Handler) getLightById(c *gin.Context) {
 }
 
 func (h *Handler) updateLight(c *gin.Context) {
-	user, ok := h.GetUser(c)
+	userId, ok := c.Get(userCtx)
 	if !ok {
-		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
@@ -88,7 +85,7 @@ func (h *Handler) updateLight(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.DeviceLight.Update(user.Id, lightId, input); err != nil {
+	if err := h.services.DeviceLight.Update(cast.ToInt(userId), lightId, input); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -97,9 +94,8 @@ func (h *Handler) updateLight(c *gin.Context) {
 }
 
 func (h *Handler) deleteLight(c *gin.Context) {
-	user, ok := h.GetUser(c)
+	userId, ok := c.Get(userCtx)
 	if !ok {
-		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
@@ -109,7 +105,7 @@ func (h *Handler) deleteLight(c *gin.Context) {
 		return
 	}
 
-	err = h.services.DeviceLight.Delete(user.Id, lightId)
+	err = h.services.DeviceLight.Delete(cast.ToInt(userId), lightId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -121,9 +117,8 @@ func (h *Handler) deleteLight(c *gin.Context) {
 }
 
 func (h *Handler) toggleLight(c *gin.Context) {
-	user, ok := h.GetUser(c)
+	userId, ok := c.Get(userCtx)
 	if !ok {
-		newErrorResponse(c, http.StatusUnauthorized, "incorrect login or password")
 		return
 	}
 
@@ -133,7 +128,7 @@ func (h *Handler) toggleLight(c *gin.Context) {
 		return
 	}
 
-	err = h.services.DeviceLight.Toggle(user.Id, lightId)
+	err = h.services.DeviceLight.Toggle(cast.ToInt(userId), lightId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
